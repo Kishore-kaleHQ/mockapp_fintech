@@ -33,4 +33,4 @@ RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 
 # Start Django application with Gunicorn
-CMD ["gunicorn", "fintech_platform.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "mockapp_fintech.wsgi:application", "--bind", "0.0.0.0:8000"]
