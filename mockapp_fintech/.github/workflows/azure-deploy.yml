@@ -1,0 +1,36 @@
+name: Azure Web App Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Log in to Azure Container Registry
+        run: az acr login --name mockappfintechacr
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t mockappfintechacr.azurecr.io/mockapp_fintech:latest .
+          docker push mockappfintechacr.azurecr.io/mockapp_fintech:latest
+
+      - name: Deploy to Azure Web App
+        run: |
+          az webapp config container set \
+            --name mockapp-fintech \
+            --resource-group mockapp-fintech-rg \
+            --docker-custom-image-name mockappfintechacr.azurecr.io/mockapp_fintech:latest \
+            --docker-registry-server-url https://mockappfintechacr.azurecr.io
+          az webapp restart --name mockapp-fintech --resource-group mockapp-fintech-rg
