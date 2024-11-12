@@ -12,9 +12,6 @@ RUN apt-get update && apt-get install -y \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Create directories
-RUN mkdir -p /app/staticfiles /app/static
-
 # Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -24,5 +21,4 @@ COPY . .
 
 EXPOSE 8000
 
-# Remove the collectstatic command from here
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "mockapp_fintech.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "mockapp_fintech.wsgi:application", "--timeout", "120"]
