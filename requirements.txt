@@ -1,2 +1,8 @@
-Django>=3.2,<4.0
-gunicorn
+Django==5.0.1
+djangorestframework==3.14.0
+psycopg2-binary==2.9.9
+python-dotenv==1.0.0
+gunicorn==21.2.0
+whitenoise==6.6.0
+django-cors-headers==4.3.1
+drf-yasg==1.21.7
