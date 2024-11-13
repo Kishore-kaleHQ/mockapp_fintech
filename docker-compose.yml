@@ -1,11 +1,31 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=mockapp_fintech
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   web:
     build: .
     command: >
-      bash -c "python manage.py migrate &&
-               python manage.py runserver 0.0.0.0:8000"
+      bash -c "
+        echo 'Waiting for postgres...' &&
+        while !</dev/tcp/db/5432; do sleep 1; done &&
+        echo 'PostgreSQL started' &&
+        python manage.py migrate &&
+        python manage.py collectstatic --noinput &&
+        gunicorn --bind 0.0.0.0:8000 mockapp_fintech.wsgi:application
+      "
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
@@ -20,18 +40,9 @@ services:
       - DB_HOST=db
       - DB_PORT=5432
       - ALLOWED_HOSTS=localhost,127.0.0.1
-      - PYTHONPATH=/app
     depends_on:
-      - db
-  
-  db:
-    image: postgres:13
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_DB=mockapp_fintech
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      db:
+        condition: service_healthy
 
 volumes:
   postgres_data:

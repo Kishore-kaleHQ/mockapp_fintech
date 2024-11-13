@@ -1,5 +1,6 @@
+# core/urls.py
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter 
+from rest_framework.routers import DefaultRouter
 from .views import (
     PortfolioViewSet,
     InvestmentViewSet,
@@ -8,7 +9,7 @@ from .views import (
 )
 
 router = DefaultRouter()
-router.register(r'portfolio', PortfolioViewSet, basename='portfolio')
+router.register(r'portfolios', PortfolioViewSet, basename='portfolio')
 router.register(r'investments', InvestmentViewSet, basename='investment')
 router.register(r'insurance', InsuranceViewSet, basename='insurance')
 
