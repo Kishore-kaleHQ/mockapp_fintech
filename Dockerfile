@@ -12,7 +12,7 @@ RUN apt-get update && \
     gcc \
     postgresql-client \
     libpq-dev \
-    netcat-traditional \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
@@ -25,8 +25,13 @@ COPY . .
 # Create static files directory
 RUN mkdir -p staticfiles
 
+# Make startup script executable
+RUN chmod +x startup.sh
+
 EXPOSE 8000
 
-# Set the startup script as executable and use it
-RUN chmod +x startup.sh
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8000/ || exit 1
+
 CMD ["./startup.sh"]
